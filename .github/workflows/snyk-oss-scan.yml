@@ -14,8 +14,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install dependencies
-        run: npm install
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          if [ -f dev-requirements.txt ]; then pip install -r dev-requirements.txt; fi
 
       - name: Install Snyk CLI
         uses: snyk/actions/setup@master
@@ -92,8 +100,8 @@ jobs:
             for (const [key, { vuln, count, titles, severity }] of vulnMap.entries()) {
               const icon = severityIcons[severity] || '';
               const snykUrl = vuln.id ? `https://security.snyk.io/vuln/${vuln.id}` : '';
-              const pkgUrl = `https://www.npmjs.com/package/${vuln.packageName}/v/${vuln.version}`;
-              const advisorUrl = `https://security.snyk.io/package/npm/${vuln.packageName}/${vuln.version}`;
+              const pkgUrl = `https://pypi.org/project/${vuln.packageName}/${vuln.version}/`;
+              const advisorUrl = `https://security.snyk.io/package/pip/${vuln.packageName}/${vuln.version}`;
               const fix = vuln.fixedIn?.[0] || 'N/A';
               const title = [...titles][0];
               output += `| ${icon} ${severity.toUpperCase()} | [${vuln.packageName}@${vuln.version}](${pkgUrl}) | ${count} | [${title}](${snykUrl}) | ${fix} | [View](${advisorUrl}) |\n`;
