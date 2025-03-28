@@ -1,0 +1,3 @@
+flask==0.12  # XSS vuln
+PyYAML==3.13  # Code execution vuln
+requests==2.19.0  # SSL bypass
